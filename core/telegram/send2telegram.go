@@ -11,20 +11,22 @@ import (
 	"path/filepath"
 )
 
+// SendTelegramMessage sends a text message to a Telegram chat.
 func Send2TelegramMessage(botToken, chatID, message string) error {
 	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
 
+	// Prepare the request payload
 	data := url.Values{}
 	data.Set("chat_id", chatID)
 	data.Set("text", message)
 
-
+	// Send the POST request
 	resp, err := http.PostForm(apiURL, data)
-	if err != nill {
+	if err != nil {
 		return err
 	}
-
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		responseBody, _ := io.ReadAll(resp.Body)
 		fmt.Printf("Telegram API request failed with status %d: %s\n", resp.StatusCode, string(responseBody))
@@ -34,6 +36,7 @@ func Send2TelegramMessage(botToken, chatID, message string) error {
 	return nil
 }
 
+// SendTelegramDocument sends a document to a Telegram chat.
 func Send2TelegramDocument(botToken, chatID, filePath string) error {
 	fmt.Println("Sending document to Telegram:", filePath)
 	apiBaseURL := "https://api.telegram.org/bot"
