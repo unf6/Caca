@@ -11,7 +11,7 @@ import (
 )
 
 func IsEvalted() bool {
-	ret, _, _ := syscall.NewLazyDLL("shell32.dll").newProc("IsUserAnAdmin").Call()
+	ret, _, _ := syscall.NewLazyDLL("shell32.dll").NewProc("IsUserAnAdmin").Call()
 	return ret != 0
 }
 
