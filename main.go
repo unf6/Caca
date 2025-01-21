@@ -57,7 +57,7 @@ import (
 	"Caca/pkg/utils/hc"
 	"Caca/core/antidbgandvm"
 	"Caca/pkg/utils/mutex"
-	"Caca//pkg/utils/fakeerr"
+	"Caca/pkg/utils/fakeerr"
 	"Caca/core/browsers"
 	"Caca/pkg/utils/disablefr"
 	"Caca/pkg/utils/taskmanager"
