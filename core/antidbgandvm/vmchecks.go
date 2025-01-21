@@ -59,7 +59,7 @@ func CheckForKVM() (bool, error) {
 }
 
 func IsScreenSmall() (bool, error) {
-	getSystemMetrics := syscall.NewLazyDLL("user32.dll").newProc("GetSystemMetrics")
+	getSystemMetrics := syscall.NewLazyDLL("user32.dll").NewProc("GetSystemMetrics")
 	width, _, _ := 	getSystemMetrics.Call(0)
 	height, _, _ := getSystemMetrics.Call(1)
 
