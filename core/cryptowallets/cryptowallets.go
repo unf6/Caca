@@ -1,7 +1,7 @@
 package CryptoWallets
 
 import (
-	common "stealer/pkg/common"
+	common "Caca/pkg/common"
 	"fmt"
 	"os"
 	"path/filepath"
