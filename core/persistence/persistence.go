@@ -1,7 +1,7 @@
 package Persistence
 
 import (
-	common "stealer/pkg/common"
+	common "Caca/pkg/common"
 	"fmt"
 	"golang.org/x/sys/windows/registry"
 	"io"
