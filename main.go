@@ -74,7 +74,6 @@ import (
 	"Caca/core/antivirus"
 	"Caca/core/games"
 	"Caca/core/vpn"
-	"Caca/pkg/utils/hardware"
 	"Caca/core/clipboard"
     "os"
 	"os/exec"
